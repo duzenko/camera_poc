@@ -26,6 +26,7 @@ import android.media.ImageReader;
 import android.media.ImageWriter;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.util.Log;
 import android.util.Size;
 import android.view.OrientationEventListener;
 import android.view.Surface;
@@ -67,7 +68,7 @@ public class Camera {
     private ImageReader pictureImageReader;
     private ImageReader imageStreamReader;
     private ImageReader eImageStreamReader;
-    private ImageWriter imageWriter;
+    //private ImageWriter imageWriter;
     private CaptureRequest.Builder captureRequestBuilder;
     private MediaRecorder mediaRecorder;
     private boolean recordingVideo;
@@ -202,7 +203,7 @@ public class Camera {
         SurfaceTexture texture = arFlutterTexture.surfaceTexture();
         Surface surface = new Surface(texture);
 
-        imageWriter = ImageWriter.newInstance(surface, 2);
+//        imageWriter = ImageWriter.newInstance(surface, 2);
 
         cameraManager.openCamera(
                 cameraName,
@@ -212,27 +213,33 @@ public class Camera {
                         try {
                             cameraDevice = device;
 
-                            Surface eSurface = eImageStreamReader.getSurface();
+//                            Surface eSurface = eImageStreamReader.getSurface();
+                            Surface eSurface = surface;
 
                             deepAR.setRenderSurface(eSurface
                                     , previewSize.getWidth(), previewSize.getWidth());
 
-                            eImageStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
-                                @Override
-                                public void onImageAvailable(ImageReader imageReader) {
-                                    Image img = imageReader.acquireLatestImage();
+//                            int imgWrtFmt = imageWriter.getFormat();
+//                            int imgRdFmt = eImageStreamReader.getImageFormat();
+//                            Log.d("fmt", String.format("%d %d", imgRdFmt, imgWrtFmt));
 
-                                    imageWriter.queueInputImage(img);
-
-                                    img.close();
-                                }
-                            }, null);
+//                            eImageStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
+//                                @Override
+//                                public void onImageAvailable(ImageReader imageReader) {
+//                                    Image img = imageReader.acquireLatestImage();
+//
+//                                    imageWriter.queueInputImage(img);
+//
+//                                    img.close();
+//                                }
+//                            }, null);
 
                             deepAR.setFaceDetectionSensitivity(3);
                             imageStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
                                 @Override
                                 public void onImageAvailable(ImageReader imageReader) {
                                     Image img = imageReader.acquireLatestImage();
+                                    Log.d("onImageAvailable", String.format("%dx%d", img.getWidth(), img.getHeight()));
                                     if (img == null) return;
 
                                     byte[] data = convertYUV420ToNV21(img);
